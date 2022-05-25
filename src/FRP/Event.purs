@@ -26,6 +26,8 @@ import FRP.Event.Class (class Filterable, class IsEvent, count, filterMap, fix,
 import Partial.Unsafe (unsafePartial)
 import Unsafe.Reference (unsafeRefEq)
 
+foreign import unsafeCorece :: forall a b. a -> b
+
 -- | An `Event` represents a collection of discrete occurrences with associated
 -- | times. Conceptually, an `Event` is a (possibly-infinite) list of values-and-times:
 -- |
@@ -44,9 +46,9 @@ instance functorEvent :: Functor Event where
 
 instance compactableEvent :: Compactable Event where
   compact xs = map (\x -> unsafePartial fromJust x) (filter isJust xs)
-  separate xs =
-    { left: unsafePartial (map fromLeft) (filter isLeft xs)
-    , right: unsafePartial (map fromRight) (filter isRight xs)
+  separate xs = 
+    { left: unsafePartial (map (fromLeft (unsafeCorece unit))) (filter isLeft xs)
+    , right: unsafePartial (map (fromRight (unsafeCorece unit))) (filter isRight xs)
     }
 
 instance filterableEvent :: Filterable Event where
